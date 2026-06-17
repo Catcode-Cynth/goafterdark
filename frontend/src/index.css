@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Optional: Extra styles */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+@layer components {
+  .event-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
