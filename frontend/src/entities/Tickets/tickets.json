@@ -1,0 +1,58 @@
+{
+  "name": "Ticket",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string"
+    },
+    "event_title": {
+      "type": "string"
+    },
+    "event_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "event_time": {
+      "type": "string"
+    },
+    "event_location": {
+      "type": "string"
+    },
+    "event_image_url": {
+      "type": "string"
+    },
+    "quantity": {
+      "type": "number",
+      "default": 1
+    },
+    "total_price": {
+      "type": "number"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "credit_card",
+        "mobile_money",
+        "paypal"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "used",
+        "cancelled",
+        "expired"
+      ],
+      "default": "active"
+    },
+    "ticket_code": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_id",
+    "event_title",
+    "total_price"
+  ]
+}
