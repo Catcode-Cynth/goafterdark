@@ -1,214 +1,162 @@
-# Eventful Backend API
+# GoAfterDark
 
-Eventful is a backend API for managing events, ticket purchases, QR-based ticket verification, analytics, reminders, and protected access for creators and attendees.
+GoAfterDark is an event ticketing platform for nightlife in Lagos.
 
-## Features
+Creators publish events. Eventees browse, book, and hold digital passes.
 
-- JWT authentication and authorization
-- Event creation and event listing
-- Shareable event links
-- Ticket purchase flow
-- Simulated payment endpoint
-- QR code generation for purchased tickets
-- QR code verification endpoint
-- Event analytics
-- Event reminder/notification endpoint
-- Rate limiting with Nest Throttler
-- Swagger API documentation
-- Unit and integration tests
+This repo is a React/Vite frontend plus a NestJS + Prisma + Neon API.
 
-## Tech Stack
+**Repository:** https://github.com/Catcode-Cynth/goafterdark
 
-- NestJS
-- TypeScript
-- Prisma ORM
-- PostgreSQL (Neon)
-- JWT
-- Swagger
-- Jest + Supertest
+## What works
 
-## API Documentation
+- Sign up and login
+- Roles: `CREATOR` and `EVENTEE`
+- After login:
+  - Eventee → `/dashboard`
+  - Creator → `/creator/dashboard`
+- Protected routes using a JWT stored in the browser
+- Event list API: `GET /events`
+- Create event API: `POST /events` (Creator + Bearer token)
+- Ticket purchase and QR verify endpoints on the API
+- Frontend screens for login, sign up, attendee hub, creator dashboard, tickets, checkout, and create event
 
-When running locally, Swagger is available at:
+## Current limits (honest for reviewers)
 
-- [Local Swagger Docs](http://localhost:3000/api/docs)
+- Attendee and Creator dashboards still show some mock event cards until they are fully wired to `GET /events`
+- A new database has no events until a Creator creates one (`GET /events` returns `[]`)
+- Payments are simulated
+- `/api/docs` Swagger UI is not mounted in the current running API
+- Neon free compute can go Idle; the first request after sleep may time out. Retry.
 
-After deployment, Swagger will be available at:
+## Tech stack
 
-- [Production Swagger Docs](https://YOUR-RENDER-URL/api/docs)
+**Frontend** (`frontend/`)
+- React, Vite, TypeScript, React Router, Tailwind
 
-## Authentication
+**Backend** (repo root)
+- NestJS, Prisma, PostgreSQL (Neon), JWT
 
-### Register
-`POST /auth/register`
+## Ports (local)
 
-### Login
-`POST /auth/login`
+| App | URL |
+|---|---|
+| Website | http://localhost:5173 |
+| API | http://localhost:3000 |
 
-Use the returned token in Swagger with:
+Open the product at **5173**, not 3000.
 
-```text
-Bearer YOUR_ACCESS_TOKEN
-```
+## Local setup
 
-## Main Endpoints
-
-### Auth
-- `POST /auth/register`
-- `POST /auth/login`
-
-### Events
-- `POST /events` — create event
-- `GET /events` — list all upcoming events
-- `GET /events/:id/share` — get shareable event link
-- `GET /events/:id/analytics` — view event analytics
-- `GET /events/reminders` — view event reminders
-
-### Tickets
-- `POST /tickets/pay` — simulate payment
-- `POST /tickets/buy` — purchase ticket
-- `GET /tickets/verify?qrCode=...` — verify QR/ticket
-
-## Ticket Purchase Flow
-
-1. User logs in
-2. User authorizes with JWT
-3. User pays through simulated payment endpoint
-4. User buys ticket
-5. QR code is generated
-6. QR code is scanned and verified through the API
-
-## QR Code Verification
-
-When a ticket is purchased, the API generates a QR code image.  
-That QR code encodes a verification URL. When scanned, it opens the ticket verification endpoint and validates whether the ticket is still valid.
-
-## Analytics
-
-The analytics endpoint returns event-level stats such as:
-
-- total tickets sold
-- total attendees
-
-Example:
-
-```http
-GET /events/:id/analytics
-```
-
-## Notifications / Reminders
-
-The reminders endpoint returns upcoming event reminder information based on event date.
-
-Example:
-
-```http
-GET /events/reminders
-```
-
-## Payments
-
-Payments are currently simulated for assignment/demo purposes.
-
-Example:
-
-```http
-POST /tickets/pay
-```
-
-## Rate Limiting
-
-Basic rate limiting is implemented using NestJS Throttler.
-
-## Testing
-
-This project includes:
-
-- unit tests
-- integration tests
-
-Run tests with:
+### Backend
 
 ```bash
-npm run test
-npm run test:e2e
-```
-
-## Local Setup
-
-### 1. Install dependencies
-
-```bash
+git clone https://github.com/Catcode-Cynth/goafterdark.git
+cd goafterdark
 npm install
-```
+Create .env in the repo root (do not commit it):
 
-### 2. Configure environment variables
-
-Create a `.env` file with:
-
-```env
-DATABASE_URL=your_neon_database_url
+env
+DATABASE_URL=your_neon_pooled_url
 DIRECT_URL=your_neon_direct_url
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=1d
-PAYSTACK_SECRET_KEY=your_paystack_key
 PORT=3000
 NODE_ENV=development
-```
-
-### 3. Generate Prisma client
-
-```bash
+bash
 npx prisma generate
-```
-
-### 4. Push schema to database
-
-```bash
 npx prisma db push
-```
-
-### 5. Start the app
-
-```bash
 npm run start:dev
-```
+Wait for:
 
-## Notes
+text
+Application is running on: http://localhost:3000
+Frontend
+bash
+cd frontend
+npm install
+Create frontend/.env:
 
-- If Neon is idle, the first request may fail while the database wakes up. Retrying usually resolves it.
-- Payment is simulated rather than fully integrated with Paystack.
-- QR verification is API-based and designed for backend validation.
+env
+VITE_API_URL=http://localhost:3000
+bash
+npm run dev
+Open http://localhost:5173/login
 
-## Future Improvements
+Auth
+Sign up
+POST /auth/signup
 
-- Real Paystack transaction initialization and verification
-- Email/SMS reminders
-- Redis caching layer
-- More extensive test coverage
-- Production-ready check-in / scan-once logic
+json
+{
+  "email": "you@example.com",
+  "password": "secret12",
+  "firstName": "Ada",
+  "lastName": "Okafor",
+  "role": "EVENTEE"
+}
+role must be EVENTEE or CREATOR.
 
-HEAD
-  The backend system has been fully implemented and tested locally using Swagger.
+Login
+POST /auth/login
 
-The backend system has been fully implemented and tested locally using Swagger.
-4165d1b (fix: correct NestJS build entry point and resolve Render 404 startup issue)
+json
+{
+  "email": "you@example.com",
+  "password": "secret12"
+}
+Response includes accessToken and user.role.
 
-Core features include:
-- Authentication (JWT)
-- Event creation and management
-- Ticket purchase with QR code generation
-- QR code verification
-- Analytics and reminders
-- Simulated payment flow
-- Unit and integration tests
+Use:
 
-The application has been deployed on Render.
-
-Note: Swagger documentation works correctly in the local environment. The deployed version may not display the Swagger UI due to production environment configuration, but all endpoints are implemented and accessible.
-
-
-
-## Author
-
+text
+Authorization: Bearer ACCESS_TOKEN
+API routes
+Auth
+POST /auth/signup
+POST /auth/login
+Events
+GET /events
+POST /events (JWT, Creator)
+GET /events/:id/share
+GET /events/:id/analytics
+GET /events/reminders
+Tickets
+POST /tickets/pay
+POST /tickets/buy
+GET /tickets/verify?qrCode=...
+Health
+GET /
+Frontend routes
+Path	Screen
+/	Public homepage
+/login	Sign in
+/signup	Create account
+/dashboard	Eventee home
+/events	Events feed
+/tickets	My tickets
+/creator/dashboard	Creator home
+/creator/events/new	Create event
+/creator/studio	Creator studio
+/creator/attendees	Attendees
+/creator/bookings	Bookings
+/creator/profile	Creator profile
+Demo flow
+Wake Neon if the project is Idle
+Start the API on 3000 and the site on 5173
+Sign up as Creator and as Eventee
+Confirm each role opens the correct dashboard
+Create an event with POST /events and a Bearer token
+Confirm GET /events is no longer empty
+Notes
+If login fails with a timeout, Neon is waking. Retry after a few seconds.
+CORS is enabled for http://localhost:5173.
+Never commit .env files.
+Tests
+bash
+npm run test
+npm run test:e2e
+Author
 Cynthia Okechukwu
+https://github.com/Catcode-Cynth/goafterdark
+
