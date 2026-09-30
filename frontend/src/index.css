@@ -1,14 +1,30 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-/* Optional: Extra styles */
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
+@layer base {
+  :root {
+    --bg-app: #F7F5FB;
+    --card-bg: #FFFFFF;
+    --text-primary: #1A1228;
+    --text-secondary: #6B6280;
+    --brand-purple: #7C3AED;
+    --border-color: #E8E2F3;
+  }
 
-@layer components {
-  .event-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light;
+    background-color: #F7F5FB;
+    color: #1A1228;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+    background-color: #F7F5FB;
+    color: #1A1228;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 }
+
+
