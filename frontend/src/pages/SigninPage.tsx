@@ -12,11 +12,15 @@ import {
   CheckCircle2
 } from "lucide-react";
 
-import { loginRequest, setToken } from '../lib/api';
+import { loginRequest, setToken, setStoredUser } from '../lib/api';
 
 export interface SignInPageProps {
   onBack?: () => void;
-  onLoginSuccess?: (user: { email: string; name?: string }) => void;
+  onLoginSuccess?: (user: {
+    email: string;
+    name?: string;
+    role?: 'CREATOR' | 'EVENTEE';
+  }) => void;
   onForgotPassword?: () => void;
   onSignUp?: () => void;
 }
@@ -52,18 +56,28 @@ export default function SignInPage({
     try {
       const data = await loginRequest(email, password);
       const token = data.access_token || data.accessToken || data.token;
-      if (token) setToken(token);
+      if (!token) {
+        setErrorMessage("Login succeeded but no token was returned");
+        return;
+      }
+
+      setToken(token);
+      setStoredUser({
+        email: data.user?.email || email,
+        role: data.user?.role,
+      });
 
       setSuccessMessage("Logged in successfully! Welcome back.");
       onLoginSuccess?.({
-  email: data.user?.email || email,
-  name: data.user?.firstName || email.split('@')[0],
-  role: data.user?.role,
-});
+        email: data.user?.email || email,
+        name: data.user?.firstName || email.split('@')[0],
+        role: data.user?.role,
+      });
     } catch (err) {
       setErrorMessage(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
+    
     }
   };
 
